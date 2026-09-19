@@ -4,7 +4,7 @@
 .cd-main { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0; }
 .cd-main--scroll { overflow-y: auto; }
 
-.cd-rail { position: absolute; right: 0; bottom: 24px; display: flex; flex-direction: column; gap: 6px; z-index: 2; transition: right 0.15s ease; }
+.cd-rail { position: absolute; right: 0; bottom: 24px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; z-index: 2; transition: right 0.15s ease; }
 .cd-row--open .cd-rail { right: 380px; }
 .cd-rail__btn {
   width: 40px; border: 1px solid var(--color-border, #e2e5eb); border-right: none;
@@ -16,7 +16,7 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .cd-rail__btn:hover { background: var(--color-accent-soft, #eef); color: var(--color-accent, #4338ca); }
-.cd-rail__btn--active { transform: translateX(-14px); border-color: var(--color-accent, #4338ca); color: var(--color-accent, #4338ca); box-shadow: -4px 2px 8px rgba(0, 0, 0, 0.12); }
+.cd-rail__btn--active { width: 46px; margin-right: -1px; border-color: var(--color-accent, #4338ca); color: var(--color-accent, #4338ca); background: var(--color-surface, #fff); box-shadow: none; position: relative; }
 
 .cd-panel { width: 380px; flex-shrink: 0; height: 100%; background: var(--color-surface, #fff); border-left: 1px solid var(--color-border, #e2e5eb); display: flex; flex-direction: column; overflow: hidden; }
 
