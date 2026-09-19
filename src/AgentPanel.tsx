@@ -7,6 +7,10 @@ export interface AgentConfig {
   aiConfigured: boolean
   starters?: string[]
   intro?: string
+  /** Extra fields merged into every chat request body (e.g. project_id / person_id). */
+  chatExtra?: Record<string, unknown>
+  /** Change this to start a fresh conversation (e.g. when the page's scope changes). */
+  resetKey?: string
 }
 
 interface Message {
@@ -16,7 +20,7 @@ interface Message {
 
 /** Chat-only for now (proposal cards / actions are a later step). History is plain React state,
  * not persisted — a working-session tool, same deliberate v1 scope every app's chat had. */
-export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro }: AgentConfig) {
+export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro, chatExtra }: AgentConfig) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -42,7 +46,7 @@ export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro
       const res = await fetch(chatUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: next }),
+        body: JSON.stringify({ ...chatExtra, messages: next }),
       })
       const data = (await res.json().catch(() => null)) as { reply?: string; error?: string } | null
       if (data?.error) setError(data.error)

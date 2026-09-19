@@ -7,6 +7,12 @@ export default function JournalPanel({ depotUrl = 'http://localhost:8090', proje
     const [entries, setEntries] = useState(null);
     const [text, setText] = useState('');
     const [posting, setPosting] = useState(false);
+    // Leaving a project page (projectId cleared) drops back to the personal feed.
+    useEffect(() => {
+        if (!projectId)
+            setSelected(personId ? PERSONAL : projects[0]?.id ?? '');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projectId, personId]);
     const resolveKey = resolve ? `${resolve.applicationId}|${resolve.externalRef}` : '';
     useEffect(() => {
         if (projectId || !resolve)
@@ -31,8 +37,8 @@ export default function JournalPanel({ depotUrl = 'http://localhost:8090', proje
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [depotUrl, projectId, resolveKey]);
-    const activeProject = projectId ?? (resolved && resolved !== 'pending' ? resolved.id : null);
-    const scope = activeProject && !personId ? activeProject : selected;
+    const resolvedId = resolved && resolved !== 'pending' ? resolved.id : null;
+    const scope = projectId ?? resolvedId ?? selected;
     const feedUrl = scope === PERSONAL
         ? `${depotUrl}/api/people/${personId}/notes`
         : scope

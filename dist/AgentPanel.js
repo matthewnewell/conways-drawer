@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useRef, useState } from 'react';
 /** Chat-only for now (proposal cards / actions are a later step). History is plain React state,
  * not persisted — a working-session tool, same deliberate v1 scope every app's chat had. */
-export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro }) {
+export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro, chatExtra }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [error, setError] = useState(null);
@@ -27,7 +27,7 @@ export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro
             const res = await fetch(chatUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: next }),
+                body: JSON.stringify({ ...chatExtra, messages: next }),
             });
             const data = (await res.json().catch(() => null));
             if (data?.error)

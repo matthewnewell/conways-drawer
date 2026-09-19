@@ -9,6 +9,9 @@ export interface DrawerLayoutProps {
     children: ReactNode;
     /** Main column scrolls by default; pass false if the page manages its own scrolling. */
     scrollMain?: boolean;
+    /** If set, the open tab is remembered in localStorage under this key (survives navigation
+     * that unmounts the layout, and reloads). */
+    storageKey?: string;
 }
 /**
  * The one Agent | Journal file-drawer every app in the ecosystem shares. Bottom-right tab rail:
@@ -16,4 +19,4 @@ export interface DrawerLayoutProps {
  * edge and the active tab pulls out further over the main content. Clicking the open tab
  * pushes it back in. Chat-only Agent for now; the Journal is the Depot's shared feed.
  */
-export default function DrawerLayout({ agent, journal, children, scrollMain }: DrawerLayoutProps): import("react").JSX.Element;
+export default function DrawerLayout({ agent, journal, children, scrollMain, storageKey }: DrawerLayoutProps): import("react").JSX.Element;

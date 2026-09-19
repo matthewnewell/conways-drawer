@@ -17,6 +17,9 @@ export interface DrawerLayoutProps {
   children: ReactNode
   /** Main column scrolls by default; pass false if the page manages its own scrolling. */
   scrollMain?: boolean
+  /** If set, the open tab is remembered in localStorage under this key (survives navigation
+   * that unmounts the layout, and reloads). */
+  storageKey?: string
 }
 
 /**
@@ -25,13 +28,29 @@ export interface DrawerLayoutProps {
  * edge and the active tab pulls out further over the main content. Clicking the open tab
  * pushes it back in. Chat-only Agent for now; the Journal is the Depot's shared feed.
  */
-export default function DrawerLayout({ agent, journal, children, scrollMain = true }: DrawerLayoutProps) {
-  const [active, setActive] = useState<Tab>(null)
+export default function DrawerLayout({ agent, journal, children, scrollMain = true, storageKey }: DrawerLayoutProps) {
+  const [active, setActive] = useState<Tab>(() => {
+    if (!storageKey) return null
+    try {
+      const v = window.localStorage.getItem(storageKey)
+      return v === 'agent' || v === 'journal' ? v : null
+    } catch {
+      return null
+    }
+  })
 
   // The panel resizes the main column via CSS alone, so nudge a resize once it settles
   // (charts/timelines that measure their container re-measure off it).
   const select = (tab: Tab) => {
     setActive(tab)
+    if (storageKey) {
+      try {
+        if (tab) window.localStorage.setItem(storageKey, tab)
+        else window.localStorage.removeItem(storageKey)
+      } catch {
+        /* storage blocked — just doesn't persist */
+      }
+    }
     setTimeout(() => window.dispatchEvent(new Event('resize')), 80)
   }
 
@@ -40,7 +59,7 @@ export default function DrawerLayout({ agent, journal, children, scrollMain = tr
       <div className={`cd-main${scrollMain ? ' cd-main--scroll' : ''}`}>{children}</div>
       {active && (
         <aside className="cd-panel">
-          {active === 'agent' ? <AgentPanel {...agent} /> : <JournalPanel {...journal} />}
+          {active === 'agent' ? <AgentPanel key={agent.resetKey} {...agent} /> : <JournalPanel {...journal} />}
         </aside>
       )}
       <div className="cd-rail">
