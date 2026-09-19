@@ -1,5 +1,7 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 /** Chat-only for now (proposal cards / actions are a later step). History is plain React state,
  * not persisted — a working-session tool, same deliberate v1 scope every app's chat had. */
 export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro, chatExtra }) {
@@ -48,7 +50,7 @@ export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro
     if (!aiConfigured) {
         return (_jsx("div", { className: "cd-agent cd-agent--empty", children: _jsxs("div", { className: "cd-agent__not-configured", children: ["AI is not configured for this instance. Set ", _jsx("code", { children: "AI_PROVIDER" }), " to", ' ', _jsx("code", { children: "claude" }), ", ", _jsx("code", { children: "gemini" }), ", ", _jsx("code", { children: "ollama" }), ", or ", _jsx("code", { children: "depot" }), ". Everything else works fully without it."] }) }));
     }
-    return (_jsxs("div", { className: "cd-agent", children: [_jsxs("div", { className: "cd-agent__messages", ref: listRef, children: [messages.length === 0 && (_jsxs("div", { className: "cd-agent__intro", children: [intro && _jsx("p", { children: intro }), _jsx("div", { className: "cd-agent__starters", children: starters.map((p) => (_jsx("button", { className: "cd-agent__starter", onClick: () => send(p), children: p }, p))) })] })), messages.map((m, i) => (_jsx("div", { className: `cd-agent__msg cd-agent__msg--${m.role}`, children: m.content }, i))), pending && _jsx("div", { className: "cd-agent__msg cd-agent__msg--assistant cd-agent__msg--pending", children: "thinking\u2026" }), error && _jsx("div", { className: "cd-agent__error", children: error })] }), _jsxs("form", { className: "cd-agent__input-row", onSubmit: (e) => {
+    return (_jsxs("div", { className: "cd-agent", children: [_jsxs("div", { className: "cd-agent__messages", ref: listRef, children: [messages.length === 0 && (_jsxs("div", { className: "cd-agent__intro", children: [intro && _jsx("p", { children: intro }), _jsx("div", { className: "cd-agent__starters", children: starters.map((p) => (_jsx("button", { className: "cd-agent__starter", onClick: () => send(p), children: p }, p))) })] })), messages.map((m, i) => (_jsx("div", { className: `cd-agent__msg cd-agent__msg--${m.role}`, children: m.role === 'assistant' ? (_jsx("div", { className: "cd-agent__md", children: _jsx(ReactMarkdown, { remarkPlugins: [remarkGfm], children: m.content }) })) : (m.content) }, i))), pending && _jsx("div", { className: "cd-agent__msg cd-agent__msg--assistant cd-agent__msg--pending", children: "thinking\u2026" }), error && _jsx("div", { className: "cd-agent__error", children: error })] }), _jsxs("form", { className: "cd-agent__input-row", onSubmit: (e) => {
                     e.preventDefault();
                     send(input);
                 }, children: [_jsx("textarea", { className: "cd-agent__input", value: input, rows: 2, placeholder: "Ask a question\u2026", onChange: (e) => setInput(e.target.value), onKeyDown: (e) => {

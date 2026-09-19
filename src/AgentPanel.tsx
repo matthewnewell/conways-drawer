@@ -91,7 +91,13 @@ export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro
         )}
         {messages.map((m, i) => (
           <div key={i} className={`cd-agent__msg cd-agent__msg--${m.role}`}>
-            {m.content}
+            {m.role === 'assistant' ? (
+              <div className="cd-agent__md">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+              </div>
+            ) : (
+              m.content
+            )}
           </div>
         ))}
         {pending && <div className="cd-agent__msg cd-agent__msg--assistant cd-agent__msg--pending">thinking…</div>}
