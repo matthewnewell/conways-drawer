@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 export interface AgentConfig {
   /** Full URL of this app's own chat endpoint. Receives `{messages}`, returns `{reply}` or
