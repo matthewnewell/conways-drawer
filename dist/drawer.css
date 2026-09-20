@@ -70,3 +70,12 @@ a.cd-journal__body { color: var(--color-accent, #4338ca); }
 .cd-agent__md th { background: var(--color-surface, #fff); }
 .cd-agent__md a { color: var(--color-accent, #4338ca); }
 .cd-agent__md blockquote { margin: 0 0 8px; padding-left: 10px; border-left: 3px solid var(--color-border-strong, #c7cbd4); color: var(--color-text-secondary, #62687a); }
+
+/* Back bar: reserves its own 28px above the app (body padding + shrinking the app's root layout,
+   which each app sizes to 100vh) so it never overlaps the app's own navbar. */
+.cd-backbar { position: fixed; top: 0; left: 0; right: 0; height: 28px; z-index: 9999; display: flex; align-items: center; gap: 10px; padding: 0 14px; background: #191c22; color: #fff; font: 12px/1 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.cd-backbar__link { color: #fff; font-weight: 700; text-decoration: none; }
+.cd-backbar__link:hover { text-decoration: underline; }
+.cd-backbar__where { color: #9198a8; }
+body.cd-has-bar { padding-top: 28px; box-sizing: border-box; }
+body.cd-has-bar #root > *:not(.cd-backbar) { height: 100% !important; }
