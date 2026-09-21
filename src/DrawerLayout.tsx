@@ -39,6 +39,16 @@ export default function DrawerLayout({ agent, journal, children, scrollMain = tr
     }
   })
 
+  // Once opened, the Agent stays mounted (just hidden) so its conversation, draft and any
+  // in-flight reply survive collapsing or switching to the Journal. The Journal is remounted on
+  // open on purpose — it refetches, so it's never stale.
+  // A reply the person sent from the Agent to the Journal: the composer opens pre-filled with it
+  // so they can trim it, pick the scope, and press Add themselves (nothing posts automatically).
+  const [journalDraft, setJournalDraft] = useState<{ text: string; nonce: number } | null>(null)
+
+  const [agentSeen, setAgentSeen] = useState(active === 'agent')
+  if (active === 'agent' && !agentSeen) setAgentSeen(true)
+
   // The panel resizes the main column via CSS alone, so nudge a resize once it settles
   // (charts/timelines that measure their container re-measure off it).
   const select = (tab: Tab) => {
@@ -57,11 +67,26 @@ export default function DrawerLayout({ agent, journal, children, scrollMain = tr
   return (
     <div className={`cd-row${active ? ' cd-row--open' : ''}`}>
       <div className={`cd-main${scrollMain ? ' cd-main--scroll' : ''}`}>{children}</div>
-      {active && (
-        <aside className="cd-panel">
-          {active === 'agent' ? <AgentPanel key={agent.resetKey} {...agent} /> : <JournalPanel {...journal} />}
-        </aside>
-      )}
+      <aside className="cd-panel" hidden={!active}>
+        {agentSeen && (
+          <div className="cd-panel__pane" hidden={active !== 'agent'}>
+            <AgentPanel
+              key={agent.resetKey}
+              {...agent}
+              sessionKey={storageKey ? `${storageKey}:chat:${agent.resetKey ?? ''}` : undefined}
+              onPostToJournal={(text) => {
+                setJournalDraft({ text, nonce: Date.now() })
+                select('journal')
+              }}
+            />
+          </div>
+        )}
+        {active === 'journal' && (
+          <div className="cd-panel__pane">
+            <JournalPanel {...journal} draft={journalDraft} onDraftUsed={() => setJournalDraft(null)} />
+          </div>
+        )}
+      </aside>
       <div className="cd-rail">
         {TABS.map((t) => {
           const isActive = active === t.id

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -20,10 +20,47 @@ interface Message {
   content: string
 }
 
-/** Chat-only for now (proposal cards / actions are a later step). History is plain React state,
- * not persisted — a working-session tool, same deliberate v1 scope every app's chat had. */
-export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro, chatExtra }: AgentConfig) {
-  const [messages, setMessages] = useState<Message[]>([])
+const MAX_SAVED_MESSAGES = 40
+
+function loadChat(key: string | undefined): Message[] {
+  if (!key) return []
+  try {
+    const raw = window.sessionStorage.getItem(key)
+    const parsed = raw ? JSON.parse(raw) : []
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+function saveChat(key: string | undefined, messages: Message[]) {
+  if (!key) return
+  try {
+    if (messages.length === 0) window.sessionStorage.removeItem(key)
+    else window.sessionStorage.setItem(key, JSON.stringify(messages.slice(-MAX_SAVED_MESSAGES)))
+  } catch {
+    /* storage blocked or full — the chat just won't survive a reload */
+  }
+}
+
+/** Chat-only for now (proposal cards / actions are a later step). The conversation survives
+ * collapsing the drawer, switching tabs (DrawerLayout keeps this mounted) and reloads / page
+ * changes (saved per browser tab in sessionStorage, keyed by `sessionKey`, which includes the
+ * scope's resetKey — so a new project or person starts fresh). Deliberately sessionStorage, not
+ * localStorage: replies can contain project data and shouldn't outlive the tab. */
+export default function AgentPanel({
+  chatUrl,
+  aiConfigured,
+  starters = [],
+  intro,
+  chatExtra,
+  sessionKey,
+  onPostToJournal,
+}: AgentConfig & { sessionKey?: string; onPostToJournal?: (text: string) => void }) {
+  const [messages, setMessages] = useState<Message[]>(() => loadChat(sessionKey))
+  useEffect(() => {
+    saveChat(sessionKey, messages)
+  }, [sessionKey, messages])
   const [input, setInput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
@@ -92,9 +129,20 @@ export default function AgentPanel({ chatUrl, aiConfigured, starters = [], intro
         {messages.map((m, i) => (
           <div key={i} className={`cd-agent__msg cd-agent__msg--${m.role}`}>
             {m.role === 'assistant' ? (
-              <div className="cd-agent__md">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
-              </div>
+              <>
+                <div className="cd-agent__md">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                </div>
+                {onPostToJournal && m.content && (
+                  <button
+                    className="cd-agent__to-journal"
+                    onClick={() => onPostToJournal(m.content)}
+                    title="Move this reply into the Journal composer to review and add"
+                  >
+                    📝 Add to Journal
+                  </button>
+                )}
+              </>
             ) : (
               m.content
             )}

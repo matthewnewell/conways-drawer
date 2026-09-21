@@ -18,5 +18,15 @@ export interface JournalConfig {
         id: string;
         name: string;
     }[];
+    /** Optional extra facts about what's on screen (e.g. a project's materials or status) that
+     * the "✨ Enhance" button may use to make a vague note specific. Plain text. */
+    context?: string;
 }
-export default function JournalPanel({ depotUrl, projectId, resolve, personId, projects }: JournalConfig): import("react").JSX.Element;
+export default function JournalPanel({ depotUrl, projectId, resolve, personId, projects, context, draft, onDraftUsed, }: JournalConfig & {
+    /** Text to pre-fill the composer with (e.g. an Agent reply). Applied once per `nonce`. */
+    draft?: {
+        text: string;
+        nonce: number;
+    } | null;
+    onDraftUsed?: () => void;
+}): import("react").JSX.Element;

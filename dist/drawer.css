@@ -79,3 +79,25 @@ a.cd-journal__body { color: var(--color-accent, #4338ca); }
 .cd-backbar__where { color: #9198a8; }
 body.cd-has-bar { padding-top: 28px; box-sizing: border-box; }
 body.cd-has-bar #root > *:not(.cd-backbar) { height: 100% !important; }
+
+/* Journal composer: Add + Enhance stack; the refine strip appears after an enhance */
+.cd-journal__composer-wrap { border-top: 1px solid var(--color-border, #e2e5eb); }
+.cd-journal__composer-wrap .cd-journal__composer { border-top: none; }
+.cd-journal__actions { display: flex; flex-direction: column; gap: 6px; align-self: flex-end; }
+.cd-journal__enhance { border: 1px solid var(--color-accent, #4338ca); background: var(--color-surface, #fff); color: var(--color-accent, #4338ca); border-radius: var(--radius-sm, 6px); padding: 7px 10px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.cd-journal__enhance:hover:not(:disabled) { background: var(--color-accent-soft, #eef); }
+.cd-journal__enhance:disabled { opacity: 0.5; cursor: default; }
+.cd-journal__refine { display: flex; gap: 8px; align-items: center; padding: 0 16px 12px; }
+.cd-journal__undo { border: none; background: transparent; color: var(--color-text-secondary, #62687a); font-size: 12px; font-weight: 700; cursor: pointer; padding: 4px 6px; border-radius: var(--radius-sm, 6px); white-space: nowrap; }
+.cd-journal__undo:hover:not(:disabled) { background: var(--color-surface-sunken, #f0f1f5); color: var(--color-accent, #4338ca); }
+.cd-journal__refine-input { flex: 1; min-width: 0; border: 1px solid var(--color-border-strong, #c7cbd4); border-radius: var(--radius-sm, 6px); padding: 6px 8px; font-size: 12px; font-family: inherit; }
+.cd-journal__refine-input:focus { outline: none; border-color: var(--color-accent, #4338ca); }
+.cd-journal__ai-error { margin: 0 16px 10px; font-size: 12px; color: var(--color-critical, #dc2626); background: var(--color-critical-soft, #fee2e2); border-radius: var(--radius-sm, 6px); padding: 6px 8px; }
+
+/* Panes stay mounted while hidden (see DrawerLayout) — `hidden` must beat the flex display above. */
+.cd-panel[hidden], .cd-panel__pane[hidden] { display: none !important; }
+.cd-panel__pane { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; }
+
+/* "Add to Journal" under each Agent reply */
+.cd-agent__to-journal { margin-top: 8px; border: none; background: transparent; padding: 2px 0; font-size: 11px; font-weight: 700; color: var(--color-text-faint, #8a90a2); cursor: pointer; }
+.cd-agent__to-journal:hover { color: var(--color-accent, #4338ca); }

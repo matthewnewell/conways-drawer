@@ -14,6 +14,9 @@ export interface JournalConfig {
    * just this (plus `projects` if you want the picker). */
   personId?: string
   projects?: { id: string; name: string }[]
+  /** Optional extra facts about what's on screen (e.g. a project's materials or status) that
+   * the "✨ Enhance" button may use to make a vague note specific. Plain text. */
+  context?: string
 }
 
 interface Entry {
@@ -27,14 +30,55 @@ interface Entry {
 
 const PERSONAL = 'personal'
 
-export default function JournalPanel({ depotUrl = 'http://localhost:8090', projectId, resolve, personId, projects = [] }: JournalConfig) {
+const ENHANCE_SYSTEM =
+  'You polish short work-journal notes. Rewrite the note to be clear, specific, and concise while ' +
+  "keeping the author's meaning, voice, and every fact in it. You may use the context ONLY to make " +
+  'vague references specific (a full date, a part or order number, a project name) when the context ' +
+  'states them plainly. Never add facts, causes, decisions, opinions, or next steps that are not in ' +
+  'the note or the context. No greetings, no commentary, no quotation marks. Reply with ONLY the ' +
+  'rewritten note as plain text.'
+
+export default function JournalPanel({
+  depotUrl = 'http://localhost:8090',
+  projectId,
+  resolve,
+  personId,
+  projects = [],
+  context,
+  draft,
+  onDraftUsed,
+}: JournalConfig & {
+  /** Text to pre-fill the composer with (e.g. an Agent reply). Applied once per `nonce`. */
+  draft?: { text: string; nonce: number } | null
+  onDraftUsed?: () => void
+}) {
   const [resolved, setResolved] = useState<{ id: string; name: string } | null | 'pending'>(
     !projectId && resolve ? 'pending' : null,
   )
   const [selected, setSelected] = useState<string>(projectId ?? (personId ? PERSONAL : projects[0]?.id ?? ''))
   const [entries, setEntries] = useState<Entry[] | null>(null)
-  const [text, setText] = useState('')
+  const [text, setText] = useState(draft?.text ?? '')
+  useEffect(() => {
+    if (!draft) return
+    setText(draft.text)
+    onDraftUsed?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft?.nonce])
   const [posting, setPosting] = useState(false)
+  // "✨ Enhance": AI rewrites the draft in place; every rewrite is undoable and can be steered with
+  // a follow-up instruction. It never posts — the person still presses Add.
+  const [aiOk, setAiOk] = useState(false)
+  const [enhancing, setEnhancing] = useState(false)
+  const [undo, setUndo] = useState<string[]>([])
+  const [refine, setRefine] = useState('')
+  const [aiError, setAiError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch(`${depotUrl}/api/health`)
+      .then((r) => r.json())
+      .then((d) => setAiOk(!!d.ai_configured))
+      .catch(() => setAiOk(false))
+  }, [depotUrl])
 
   // Leaving a project page (projectId cleared) drops back to the personal feed.
   useEffect(() => {
@@ -88,6 +132,51 @@ export default function JournalPanel({ depotUrl = 'http://localhost:8090', proje
     return () => clearInterval(t)
   }, [load])
 
+  async function runEnhance(instruction?: string) {
+    const base = text.trim()
+    if (!base || enhancing) return
+    setEnhancing(true)
+    setAiError(null)
+    const scopeLabel =
+      scope === PERSONAL
+        ? 'personal notes (no project)'
+        : projects.find((p) => p.id === scope)?.name ?? (resolved && resolved !== 'pending' ? resolved.name : 'this project')
+    const recent = (entries ?? [])
+      .slice(0, 8)
+      .map((e) => `- ${new Date(e.timestamp).toLocaleDateString()} ${e.author ? e.author + ': ' : ''}${e.summary}`)
+      .join('\n')
+    const system =
+      ENHANCE_SYSTEM +
+      `\n\nContext (for resolving vague references only):\nScope: ${scopeLabel}` +
+      (context ? `\n${context}` : '') +
+      `\nRecent journal entries:\n${recent || '(none)'}`
+    const userMsg = instruction
+      ? `Current note:\n${base}\n\nChange requested: ${instruction}`
+      : `Note to enhance:\n${base}`
+    try {
+      const r = await fetch(`${depotUrl}/api/ai/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: userMsg }], system, max_tokens: 400 }),
+      })
+      const d = await r.json()
+      const out = ((d.reply as string) ?? '').trim()
+      if (d.error || !out || out.startsWith('[AI error')) throw new Error(d.error ?? out ?? 'No reply')
+      setUndo((u) => [...u, text])
+      setText(out)
+      setRefine('')
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : 'Enhance failed')
+    } finally {
+      setEnhancing(false)
+    }
+  }
+
+  function undoEnhance() {
+    setText(undo[undo.length - 1] ?? '')
+    setUndo((u) => u.slice(0, -1))
+  }
+
   async function submit() {
     const body = text.trim()
     if (!body || !postUrl || posting) return
@@ -99,6 +188,9 @@ export default function JournalPanel({ depotUrl = 'http://localhost:8090', proje
         body: JSON.stringify({ body, person_id: personId ?? null }),
       })
       setText('')
+      setUndo([])
+      setRefine('')
+      setAiError(null)
       load()
     } finally {
       setPosting(false)
@@ -153,23 +245,58 @@ export default function JournalPanel({ depotUrl = 'http://localhost:8090', proje
           ))
         )}
       </div>
-      <div className="cd-journal__composer">
-        <textarea
-          className="cd-journal__input"
-          rows={2}
-          value={text}
-          placeholder="Log a note…"
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              submit()
-            }
-          }}
-        />
-        <button className="cd-journal__submit" onClick={submit} disabled={!text.trim() || posting}>
-          Add
-        </button>
+      <div className="cd-journal__composer-wrap">
+        <div className="cd-journal__composer">
+          <textarea
+            className="cd-journal__input"
+            rows={2}
+            value={text}
+            placeholder="Log a note…"
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                submit()
+              }
+            }}
+          />
+          <div className="cd-journal__actions">
+            <button className="cd-journal__submit" onClick={submit} disabled={!text.trim() || posting || enhancing}>
+              Add
+            </button>
+            {aiOk && (
+              <button
+                className="cd-journal__enhance"
+                onClick={() => runEnhance()}
+                disabled={!text.trim() || enhancing}
+                title="Rewrite this note more clearly (you review it before adding)"
+              >
+                {enhancing ? 'Enhancing…' : '✨ Enhance'}
+              </button>
+            )}
+          </div>
+        </div>
+        {aiError && <div className="cd-journal__ai-error">{aiError}</div>}
+        {undo.length > 0 && (
+          <div className="cd-journal__refine">
+            <button className="cd-journal__undo" onClick={undoEnhance} disabled={enhancing}>
+              ↩ Undo
+            </button>
+            <input
+              className="cd-journal__refine-input"
+              value={refine}
+              placeholder="Not quite? Tell it what to change…"
+              disabled={enhancing}
+              onChange={(e) => setRefine(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && refine.trim()) {
+                  e.preventDefault()
+                  runEnhance(refine.trim())
+                }
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   )

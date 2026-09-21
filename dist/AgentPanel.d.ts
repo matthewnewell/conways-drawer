@@ -10,6 +10,12 @@ export interface AgentConfig {
     /** Change this to start a fresh conversation (e.g. when the page's scope changes). */
     resetKey?: string;
 }
-/** Chat-only for now (proposal cards / actions are a later step). History is plain React state,
- * not persisted — a working-session tool, same deliberate v1 scope every app's chat had. */
-export default function AgentPanel({ chatUrl, aiConfigured, starters, intro, chatExtra }: AgentConfig): import("react").JSX.Element;
+/** Chat-only for now (proposal cards / actions are a later step). The conversation survives
+ * collapsing the drawer, switching tabs (DrawerLayout keeps this mounted) and reloads / page
+ * changes (saved per browser tab in sessionStorage, keyed by `sessionKey`, which includes the
+ * scope's resetKey — so a new project or person starts fresh). Deliberately sessionStorage, not
+ * localStorage: replies can contain project data and shouldn't outlive the tab. */
+export default function AgentPanel({ chatUrl, aiConfigured, starters, intro, chatExtra, sessionKey, onPostToJournal, }: AgentConfig & {
+    sessionKey?: string;
+    onPostToJournal?: (text: string) => void;
+}): import("react").JSX.Element;
