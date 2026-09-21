@@ -5,7 +5,7 @@
 .cd-main--scroll { overflow-y: auto; }
 
 .cd-rail { position: absolute; right: 0; bottom: 24px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; z-index: 2; transition: right 0.15s ease; }
-.cd-row--open .cd-rail { right: 380px; }
+.cd-row--open .cd-rail { right: var(--cd-panel-w, 380px); }
 .cd-rail__btn {
   width: 40px; border: 1px solid var(--color-border, #e2e5eb); border-right: none;
   border-radius: var(--radius-sm, 6px) 0 0 var(--radius-sm, 6px);
@@ -18,7 +18,7 @@
 .cd-rail__btn:hover { background: var(--color-accent-soft, #eef); color: var(--color-accent, #4338ca); }
 .cd-rail__btn--active { width: 46px; margin-right: -1px; border-color: var(--color-accent, #4338ca); color: var(--color-accent, #4338ca); background: var(--color-surface, #fff); box-shadow: none; position: relative; }
 
-.cd-panel { width: 380px; flex-shrink: 0; height: 100%; background: var(--color-surface, #fff); border-left: 1px solid var(--color-border, #e2e5eb); display: flex; flex-direction: column; overflow: hidden; }
+.cd-panel { width: var(--cd-panel-w, 380px); flex-shrink: 0; height: 100%; background: var(--color-surface, #fff); border-left: 1px solid var(--color-border, #e2e5eb); display: flex; flex-direction: column; overflow: hidden; }
 
 /* Agent */
 .cd-agent, .cd-journal { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -101,3 +101,11 @@ body.cd-has-bar #root > *:not(.cd-backbar) { height: 100% !important; }
 /* "Add to Journal" under each Agent reply */
 .cd-agent__to-journal { margin-top: 8px; border: none; background: transparent; padding: 2px 0; font-size: 11px; font-weight: 700; color: var(--color-text-faint, #8a90a2); cursor: pointer; }
 .cd-agent__to-journal:hover { color: var(--color-accent, #4338ca); }
+
+/* Extra tabs (e.g. a project's Info / Team / Admin) ride a second rail group at the TOP of the edge. */
+.cd-rail--top { bottom: auto; top: 24px; }
+.cd-panel__pane--scroll { overflow-y: auto; padding: 16px 18px 40px; background: var(--color-bg, #f5f6f9); }
+
+/* Icon-only top tabs: compact squares instead of the tall vertical-text tabs below. */
+.cd-rail--top .cd-rail__btn { writing-mode: horizontal-tb; width: 34px; height: 34px; padding: 0; font-size: 16px; line-height: 1; }
+.cd-rail--top .cd-rail__btn--active { width: 40px; }
