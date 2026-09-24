@@ -73,13 +73,6 @@ a.cd-journal__body { color: var(--color-accent, #4338ca); }
 
 /* Back bar: reserves its own 28px above the app (body padding + shrinking the app's root layout,
    which each app sizes to 100vh) so it never overlaps the app's own navbar. */
-.cd-backbar { position: fixed; top: 0; left: 0; right: 0; height: 28px; z-index: 9999; display: flex; align-items: center; gap: 10px; padding: 0 14px; background: #191c22; color: #fff; font: 12px/1 system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.cd-backbar__link { color: #fff; font-weight: 700; text-decoration: none; }
-.cd-backbar__link:hover { text-decoration: underline; }
-.cd-backbar__where { color: #9198a8; }
-body.cd-has-bar { padding-top: 28px; box-sizing: border-box; }
-body.cd-has-bar #root > *:not(.cd-backbar) { height: 100% !important; }
-
 /* Journal composer: Add + Enhance stack; the refine strip appears after an enhance */
 .cd-journal__composer-wrap { border-top: 1px solid var(--color-border, #e2e5eb); }
 .cd-journal__composer-wrap .cd-journal__composer { border-top: none; }

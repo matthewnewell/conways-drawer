@@ -1,7 +1,7 @@
 {
   "name": "@conways/drawer",
-  "version": "0.1.0",
-  "description": "The shared Agent | Journal file-drawer side panel for every app in the Conway's Depot ecosystem.",
+  "version": "0.2.0",
+  "description": "Shared UI for every app in the Conway's Depot ecosystem: the app header (back link, tabs, user menu) and the Agent | Journal drawer.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "*.css"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.json && cp src/drawer.css dist/drawer.css"
+    "build": "rm -rf dist && tsc -p tsconfig.json && cp src/*.css dist/"
   },
   "peerDependencies": {
     "react": ">=18"

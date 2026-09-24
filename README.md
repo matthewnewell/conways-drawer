@@ -1,7 +1,28 @@
 # @conways/drawer
 
-The shared **Agent | Journal** file-drawer side panel for every app in the Conway's Depot
-ecosystem — one implementation so UX and behavior are identical everywhere.
+Shared UI for every app in the Conway's Depot ecosystem, one implementation so the UX is identical
+everywhere: the **app header** (back link, app name and tabs, "viewing as" user menu) and the
+**Agent | Journal** drawer.
+
+## App header
+
+```tsx
+// main.tsx: <PersonaProvider><App /></PersonaProvider>
+<AppHeader
+  brand={<NavLink to="/about" className="ch-brand">Good Plan</NavLink>}
+  right={/* optional app controls, just left of the user menu */}
+>
+  <NavLink to="/" end className={({ isActive }) => tabClass(isActive)}>Plans</NavLink>
+</AppHeader>
+```
+
+- **Back link**: only when launched from the Depot (`?from=&depot=`), named for where it goes
+  (`from_label`, else Launchpad / Catalog / Project). Replaces the old DepotBackBar, now a no-op.
+- **User menu**: the Depot's own people list, read straight from the Depot's API. `usePersona()`
+  gives the app who's viewing; `currentPersonId()` reads it outside React. An app that reads the
+  person once at load passes `reloadOnSwitch` to PersonaProvider. An app with a richer menu of its
+  own passes it as `user`.
+- Same layout, spacing and type everywhere; each app's accent comes from its `--color-*` variables.
 
 - **Agent**: chat-only for now. Each app supplies its own chat endpoint and starter prompts (the
   AI grounding is per-app); the UX is shared.

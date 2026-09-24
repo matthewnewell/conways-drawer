@@ -1,0 +1,219 @@
+/* The shared app header (AppHeader.tsx). Same layout, spacing and type in every app; each app's
+   own accent comes through its --color-* variables. */
+.ch {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 56px;
+  padding: 8px 20px;
+  background: var(--color-surface, #fff);
+  border-bottom: 1px solid var(--color-border, #e2e5eb);
+  flex-shrink: 0;
+  box-sizing: border-box;
+  font-family: var(--font-sans, system-ui, -apple-system, 'Segoe UI', sans-serif);
+}
+
+.ch-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 240px;
+  padding-right: 16px;
+  border-right: 1px solid var(--color-border, #e2e5eb);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #62687a);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.ch-back:hover {
+  color: var(--color-accent, #4338ca);
+}
+
+.ch-brand-wrap {
+  flex-shrink: 0;
+}
+
+.ch-brand {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--color-text, #191c22);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.ch-brand:hover {
+  color: var(--color-accent, #4338ca);
+}
+
+.ch-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.ch-tab {
+  padding: 7px 13px;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #62687a);
+  text-decoration: none;
+  white-space: nowrap;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.ch-tab:hover {
+  background: var(--color-surface-sunken, #f0f1f5);
+  color: var(--color-text, #191c22);
+}
+
+.ch-tab--active,
+.ch-tab--active:hover {
+  background: var(--color-accent-soft, #eef2ff);
+  color: var(--color-accent, #4338ca);
+}
+
+.ch-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cd-user {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.cd-user__trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.cd-user__trigger:hover {
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+}
+
+.cd-user__trigger--offline {
+  border-color: var(--color-critical);
+  color: var(--color-critical);
+  cursor: default;
+}
+
+.cd-user__avatar {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cd-user__caret {
+  font-size: 10px;
+  color: var(--color-text-faint);
+}
+
+.cd-user__dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  width: 260px;
+  padding: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.cd-user__hint {
+  margin: 0;
+  padding: 8px 10px 10px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--color-text-faint);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cd-user__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  text-align: left;
+}
+
+.cd-user__item:hover {
+  background: var(--color-surface-sunken);
+}
+
+.cd-user__item--active {
+  background: var(--color-accent-soft);
+}
+
+.cd-user__check {
+  width: 12px;
+  flex-shrink: 0;
+  color: var(--color-accent);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cd-user__item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.cd-user__item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.cd-user__item-title {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+/* Name with the person's role beneath, visible without opening the menu. */
+.cd-user__id {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.cd-user__role {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+}
