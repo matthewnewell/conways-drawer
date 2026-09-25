@@ -6,7 +6,9 @@ import './header.css';
  *   ← <where you came from> │ <App>   <tabs>              <app controls>  (J) Jordan Park ▾
  *
  * - The back link only shows when the app was launched from Conway's Depot, and it names the
- *   page it goes back to ("Launchpad", "Catalog", a project's name), never the brand.
+ *   page it goes back to ("Launchpad", "Catalog", a project's name), never the brand. Inside the
+ *   demo shell it's dropped when the shell's own bar already links there (Launchpad, Projects,
+ *   Catalog); a link back to a specific project still shows.
  * - `brand` and the tabs are the app's own router links (this package doesn't depend on a
  *   router): give the brand `className="ch-brand"` and each tab `tabClass(isActive)`.
  * - `right` is for app-specific controls (a project picker, a bell), just left of the user.

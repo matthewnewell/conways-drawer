@@ -3,13 +3,18 @@ import { useEffect, useRef, useState } from 'react';
 import { readOrigin } from './origin';
 import { usePersona } from './persona';
 import './header.css';
+/** Framed by the demo shell (localhost:5180), whose bar links to these Depot pages itself. */
+const IN_DEMO_SHELL = window.self !== window.top;
+const SHELL_BAR_PAGES = new Set(['/', '/projects', '/catalog']);
 /**
  * The one header every app in the ecosystem uses, so they all look and behave the same:
  *
  *   ← <where you came from> │ <App>   <tabs>              <app controls>  (J) Jordan Park ▾
  *
  * - The back link only shows when the app was launched from Conway's Depot, and it names the
- *   page it goes back to ("Launchpad", "Catalog", a project's name), never the brand.
+ *   page it goes back to ("Launchpad", "Catalog", a project's name), never the brand. Inside the
+ *   demo shell it's dropped when the shell's own bar already links there (Launchpad, Projects,
+ *   Catalog); a link back to a specific project still shows.
  * - `brand` and the tabs are the app's own router links (this package doesn't depend on a
  *   router): give the brand `className="ch-brand"` and each tab `tabClass(isActive)`.
  * - `right` is for app-specific controls (a project picker, a bell), just left of the user.
@@ -20,7 +25,8 @@ import './header.css';
  */
 export default function AppHeader({ brand, children, right, user, }) {
     const [origin] = useState(readOrigin);
-    return (_jsxs("header", { className: "ch", children: [origin && (_jsxs("a", { className: "ch-back", href: origin.depot + origin.from, title: `Back to ${origin.label} in Conway's Depot`, children: [_jsx("span", { "aria-hidden": "true", children: "\u2190" }), " ", origin.label] })), _jsx("div", { className: "ch-brand-wrap", children: brand }), children && _jsx("nav", { className: "ch-tabs", children: children }), _jsxs("div", { className: "ch-right", children: [right, user ?? _jsx(UserMenu, {})] })] }));
+    const showBack = origin && !(IN_DEMO_SHELL && SHELL_BAR_PAGES.has(origin.from));
+    return (_jsxs("header", { className: "ch", children: [showBack && (_jsxs("a", { className: "ch-back", href: origin.depot + origin.from, title: `Back to ${origin.label} in Conway's Depot`, children: [_jsx("span", { "aria-hidden": "true", children: "\u2190" }), " ", origin.label] })), _jsx("div", { className: "ch-brand-wrap", children: brand }), children && _jsx("nav", { className: "ch-tabs", children: children }), _jsxs("div", { className: "ch-right", children: [right, user ?? _jsx(UserMenu, {})] })] }));
 }
 /** Class for an app's tab link: `className={({ isActive }) => tabClass(isActive)}`. */
 export function tabClass(isActive) {

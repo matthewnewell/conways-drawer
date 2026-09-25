@@ -1,6 +1,6 @@
 {
   "name": "@conways/drawer",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Shared UI for every app in the Conway's Depot ecosystem: the app header (back link, tabs, user menu) and the Agent | Journal drawer.",
   "type": "module",
   "main": "dist/index.js",
