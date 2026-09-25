@@ -1,6 +1,6 @@
 {
   "name": "@conways/drawer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Shared UI for every app in the Conway's Depot ecosystem: the app header (back link, tabs, user menu) and the Agent | Journal drawer.",
   "type": "module",
   "main": "dist/index.js",
@@ -9,10 +9,16 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./vite": {
+      "types": "./vite-plugin.d.ts",
+      "default": "./vite-plugin.js"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "vite-plugin.js",
+    "vite-plugin.d.ts"
   ],
   "sideEffects": [
     "*.css"
